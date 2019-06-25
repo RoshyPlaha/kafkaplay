@@ -41,10 +41,10 @@ public class Producer {
             }
 
             mLogger.info("Received new meta. \n "
-                    + "Topic: " + recordMetadata.topic()
-                    + "Partition: " + recordMetadata.partition()
-                    + "Offset: " + recordMetadata.offset()
-                    + "Timestamp: " + recordMetadata.timestamp());
+                    + "/nTopic: " + recordMetadata.topic()
+                    + "/nPartition: " + recordMetadata.partition()
+                    + "/nOffset: " + recordMetadata.offset()
+                    + "/nTimestamp: " + recordMetadata.timestamp());
         }).get(); // delete get for prod as it forces syncronicity
 
     }
