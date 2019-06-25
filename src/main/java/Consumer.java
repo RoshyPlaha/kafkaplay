@@ -30,47 +30,36 @@ public class Consumer {
         String groupId = "some_application";
         String topic = "user_registered";
 
-        new Consumer(server, groupId, topic).run();
+        final int THREAD_ONE = 1;
+        final int THREAD_TWO = 2;
+
+        Consumer consumer = new Consumer(server, groupId, topic);
+        consumer.spawn(THREAD_TWO);
+        System.out.println("Second thread time");
+        consumer.spawn(THREAD_ONE);
     }
 
-    void run() {
-        mLogger.info("Creating consumer thread");
+    void spawn(int threadNumber) {
+        mLogger.info("Creating consumer thread [" + threadNumber + "]");
 
-        CountDownLatch latch = new CountDownLatch(1);
+        ConsumerRunnable consumerRunnable = new ConsumerRunnable(mBootStrapServer, mGroupId, mTopic, threadNumber);
+        consumerRunnable.start();
+        ConsumerRunnable consumerRunnable2 = new ConsumerRunnable(mBootStrapServer, mGroupId, mTopic, threadNumber);
+        consumerRunnable2.start();
 
-        ConsumerRunnable consumerRunnable = new ConsumerRunnable(mBootStrapServer, mGroupId, mTopic, latch);
-        Thread thread = new Thread(consumerRunnable);
-        thread.start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            mLogger.info("Caught shutdown hook");
-            consumerRunnable.shutdown();
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            mLogger.info("Application has exited");
-        }));
-
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
-    private class ConsumerRunnable implements Runnable {
+    private class ConsumerRunnable extends Thread {
 
-        private CountDownLatch mLatch;
         private KafkaConsumer<String, String> mConsumer;
+        private int mThreadNumber;
 
-        ConsumerRunnable(String bootstrapServer, String groupId, String topic, CountDownLatch latch) {
-            mLatch = latch;
+        ConsumerRunnable(String bootstrapServer, String groupId, String topic, int threadNumber) {
             Properties props = consumerProps(bootstrapServer, groupId);
             mConsumer = new KafkaConsumer<String, String>(props);
             mConsumer.subscribe(Collections.singleton(topic));
+            mThreadNumber = threadNumber;
 
         }
 
@@ -94,20 +83,16 @@ public class Consumer {
                     ConsumerRecords<String, String> records = mConsumer.poll(Duration.ofMillis(100));
 
                     for(ConsumerRecord<String, String> record: records) {
-                        mLogger.info("Key: " + record.key() + ", Value: " + record.value());
-                        mLogger.info("Partition " + record.partition() + ", Offset: " + record.offset());
+                        mLogger.info(mThreadNumber + " Key: " + record.key() + ", Value: " + record.value());
+                        mLogger.info(mThreadNumber + "Partition " + record.partition() + ", Offset: " + record.offset());
                     }
                 } while (true);
             } catch(WakeupException e) {
-                mLogger.info("Received shutdown signal!");
+                mLogger.info(mThreadNumber + "Received shutdown signal!");
             } finally {
                 mConsumer.close();
-                mLatch.countDown();
             }
         }
 
-        void shutdown() {
-            mConsumer.wakeup();
-        }
     }
 }
