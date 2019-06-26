@@ -15,3 +15,6 @@ From the root of the project, run:
 docker build -t demo .
 
 docker run --rm -it demo:latest -p 9092:9092 2181:2181
+
+bug when running in docker if kafka broker is outside docker. This may fix it - but unproven
+https://stackoverflow.com/questions/35861501/kafka-in-docker-not-working
