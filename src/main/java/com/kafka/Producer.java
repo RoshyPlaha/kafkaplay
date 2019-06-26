@@ -1,3 +1,5 @@
+package com.kafka;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -17,7 +19,7 @@ public class Producer {
         Properties props = producerProps(bootstrapServer);
 
         this.mProducer = new KafkaProducer<String, String>(props);
-        mLogger.info("Producer initialized");
+        mLogger.info("com.kafka.Producer initialized");
     }
 
     private Properties producerProps(String bootStrapServer) {
@@ -45,7 +47,7 @@ public class Producer {
                     + "/nPartition: " + recordMetadata.partition()
                     + "/nOffset: " + recordMetadata.offset()
                     + "/nTimestamp: " + recordMetadata.timestamp());
-        }).get(); // delete get for prod as it forces syncronicity
+        }).get(); // delete get for prod as it forces synchronicity
 
     }
 
@@ -55,13 +57,13 @@ public class Producer {
     }
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        String server = "127.0.0.1:9092";
+        System.out.println("made it");
+        String server = "localhost:9092";
         String topic = "user_registered";
 
         Producer producer = new Producer(server);
         producer.put(topic, "user1", "john");
         producer.put(topic, "user2", "rosh");
         producer.close();
-
     }
 }
