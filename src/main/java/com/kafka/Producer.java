@@ -58,7 +58,7 @@ public class Producer {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         System.out.println("made it");
-        String server = "localhost:9092";
+        String server = "10.8.130.81:9092"; // change this to the ip of your machine using from your local host machine: ifconfig | grep 'inet 10'
         String topic = "user_registered";
 
         Producer producer = new Producer(server);
