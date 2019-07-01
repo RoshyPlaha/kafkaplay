@@ -16,5 +16,6 @@ docker build -t demo .
 
 docker run --rm -it demo:latest -p 9092:9092 2181:2181
 
-bug when running in docker if kafka broker is outside docker. This may fix it - but unproven
-https://stackoverflow.com/questions/35861501/kafka-in-docker-not-working
+
+current bug - build nested jar in maven multi project
+https://stackoverflow.com/questions/20801874/how-to-build-an-executable-jar-from-multi-module-maven-project

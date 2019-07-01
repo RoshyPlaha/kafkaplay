@@ -21,7 +21,6 @@ public class Producer {
         this.mProducer = new KafkaProducer<String, String>(props);
         mLogger.info("com.kafka.Producer initialized");
     }
-
     private Properties producerProps(String bootStrapServer) {
         String serializer = StringSerializer.class.getName();
         Properties props = new Properties();
